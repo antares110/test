@@ -38,7 +38,7 @@ public class MessageController {
   
 
   /**
-   * 微信消息接收和token验证
+   * 微信消息接收和token验证1
    * @param model
    * @param request
    * @param response
