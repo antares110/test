@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.wx</groupId>
+  <artifactId>wechatpj</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <dependencies>
+    <!-- log4j -->
+    <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
+    </dependency>
+	<dependency>
+	    <groupId>commons-logging</groupId>
+	    <artifactId>commons-logging</artifactId>
+	    <version>1.1.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpclient</artifactId>
+	    <version>4.5.2</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.httpcomponents</groupId>
+	    <artifactId>httpcore</artifactId>
+	    <version>4.4.4</version>
+	</dependency>
+	<dependency>
+	    <groupId>com.alibaba</groupId>
+	    <artifactId>fastjson</artifactId>
+	    <version>1.2.47</version>
+	</dependency>
+    <!-- spring jar -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>4.3.9.RELEASE</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>4.3.9.RELEASE</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-aspects</artifactId>
+        <version>4.3.9.RELEASE</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>4.3.9.RELEASE</version>
+        <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+    <groupId>com.thoughtworks.xstream</groupId>
+    <artifactId>xstream</artifactId>
+    <version>1.4.10</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>wechatproject</finalName>
+  </build>
+</project>
