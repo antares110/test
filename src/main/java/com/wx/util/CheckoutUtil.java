@@ -8,7 +8,7 @@ public class CheckoutUtil {
   private static String token = "testwx";
 
   /**
-   * 验证签名
+   * 验证签名1
    * 
    * @param signature
    * @param timestamp
