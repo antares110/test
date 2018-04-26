@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,16 +15,25 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.NameValuePair;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONPObject;
 import com.wx.util.CheckoutUtil;
 import com.wx.util.HttpSendUtil;
+import com.wx.util.MyList;
+import com.wx.util.TokenUtilForWX;
 import com.wx.util.XmlTransformUtil;
+import com.wx.vo.WXKfInfoVO;
+import com.wx.vo.WXKfRespVO;
+import com.wx.vo.WXKfTextVO;
 import com.wx.vo.WXMessageVO;
 import com.wx.vo.WXoauth2UserInfoVO;
 import com.wx.vo.WXoauth2VO;
@@ -35,6 +45,8 @@ public class MessageController {
   private static final Log logger = LogFactory.getLog(MessageController.class);
   
   private static final String TEST_PAGE="test/testPage";
+  private static final String INDEX_PAGE="index.html";
+  private MyList<String> mylist=new MyList<String>();
   
 
   /**
@@ -88,13 +100,25 @@ public class MessageController {
       PrintWriter print;
       if (null!=msgVO && null!=msgVO.getContent()) {
           try {
+              String echoStr="";
+              boolean flag=false;
+              switch(msgVO.getContent()) {
+                case "hello":echoStr="hello!"; break;
+                case "bye":echoStr="bye bye!"; break;
+                default: echoStr="received your message! wait for response! "; flag=true;
+              }
+              
+              if (flag) {
+                String jstr=JSON.toJSONString(msgVO);
+                mylist.push(jstr);
+              }
               WXMessageVO retMsg= new WXMessageVO();
               retMsg.setToUserName(msgVO.getFromUserName());
               retMsg.setFromUserName(msgVO.getToUserName());
               Date d=new Date();
               retMsg.setCreateTime(d.getTime());
               retMsg.setMsgType("text");
-              retMsg.setContent("echo:https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8e5f5d2d8e884804&redirect_uri=http%3a%2f%2f47.106.137.161%2fwechatpj%2fauth&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect");
+              retMsg.setContent(echoStr);
               String retStr=XmlTransformUtil.objToXml(retMsg, true);
               
               print = response.getWriter();
@@ -134,6 +158,98 @@ public class MessageController {
       return TEST_PAGE;
   }
   
+  /**
+   * 获取微信用户信息
+   * @Title: getWechatInfo   
+   * @Description: TODO(这里用一句话描述这个方法的作用)   
+   * @param: @param model
+   * @param: @param request
+   * @param: @param response
+   * @param: @throws IOException      
+   * @return: void      
+   * @throws
+   */
+  @RequestMapping(value="/wechatinfo",method=RequestMethod.GET)
+  @ResponseBody
+  public void getWechatInfo(Model model, HttpServletRequest request,HttpServletResponse response) throws IOException {
+      
+      String retJson="{}";
+      logger.info("get wechat info!");
+      String code = request.getParameter("code");
+
+      if (code != null) {
+          try {
+              //获取网页access_toekn
+              WXoauth2VO astoken=this.getPageAccessToken(code);
+              logger.info("###+++"+astoken.getAccessToken());
+              
+              if (null!=astoken && null!=astoken.getAccessToken()) {
+                WXoauth2UserInfoVO user = this.getAuthUserInfo(astoken);
+                retJson=JSON.toJSONString(user);
+              }
+              
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+      }
+      
+      response.getWriter().write(retJson);
+      response.getWriter().flush();
+  }
+  
+  
+  /**
+   * 获取消息列表
+   * @Title: getWxkfInfo   
+   * @Description: TODO(这里用一句话描述这个方法的作用)   
+   * @param: @param request
+   * @param: @param response
+   * @param: @throws Exception      
+   * @return: void      
+   * @throws
+   */
+  @RequestMapping(value="/wxkfinfo",method=RequestMethod.GET)
+  @ResponseBody
+  public void getWxkfInfo(HttpServletRequest request,HttpServletResponse response) throws Exception {
+    List<String> retList=new ArrayList<String>();
+    while(!mylist.empty()) {
+      retList.add(mylist.pop());
+    }
+    String retJson=JSON.toJSONString(retList);
+    response.getWriter().write(retJson);
+    response.getWriter().flush();
+    
+  }
+  
+  @RequestMapping(value="/wxkfinfo",method=RequestMethod.POST)
+  @ResponseBody
+  public void respWxkfInfo(HttpServletRequest request,HttpServletResponse response) throws Exception {
+    
+    
+    BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
+    String line = null;
+    String message = new String();
+    while ((line = reader.readLine()) != null) {
+        message += line;
+    }
+    Map reqMap=(Map) JSON.parse(message);
+    String retmsg=(String) reqMap.get("retMsg");
+    String touser=(String) reqMap.get("toUser");
+    //拼接客服消息
+    WXKfInfoVO kfinfo=new WXKfInfoVO();
+    WXKfTextVO kftext=new WXKfTextVO();
+    kftext.setContent(retmsg);
+    kfinfo.setText(kftext);
+    kfinfo.setTouser(touser);
+    kfinfo.setMsgtype("text");
+    String reqJson=JSON.toJSONString(kfinfo);
+    //发送消息
+    String str=this.sendWXKfInfo(reqJson);
+    response.getWriter().write(str);
+    response.getWriter().flush();
+  }
+  
+  
   
   private WXoauth2VO getPageAccessToken(String code) throws Exception {
     WXoauth2VO asVO=null;
@@ -159,6 +275,23 @@ public class MessageController {
     logger.info("auth user info json:"+new String(str.getBytes("ISO-8859-1"),"UTF-8"));
     userVO=JSON.parseObject(new String(str.getBytes("ISO-8859-1"),"UTF-8"), WXoauth2UserInfoVO.class);
     return userVO;
+  }
+  
+  private String sendWXKfInfo(String reqJson) {
+    String respStr="";
+    try {
+      StringEntity stringEntity = new StringEntity(new String(reqJson.getBytes("UTF-8"),"ISO-8859-1"));
+      stringEntity.setContentEncoding("UTF-8");
+      stringEntity.setContentType("application/json");
+      String url="https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=";
+      String str = HttpSendUtil.sendPost(url+TokenUtilForWX.getInstance().getToken(), stringEntity);
+      logger.info("sendWXKfInfo resp json:"+new String(str.getBytes("ISO-8859-1"),"UTF-8"));
+      respStr=new String(str.getBytes("ISO-8859-1"),"UTF-8");
+    }catch(Exception e) {
+      e.printStackTrace();
+    }
+    
+    return respStr;
   }
   
 }

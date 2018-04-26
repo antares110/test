@@ -157,22 +157,18 @@ public class TokenUtilForWX {
 	public static void main (String args[]) {
 	  String token=TokenUtilForWX.getInstance().getToken();
 	  System.out.println(token);
-//	  String jstr="{\"button\":[{\"type\":\"view\",\"name\":\"测试菜单\",\"url\":\"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8e5f5d2d8e884804&redirect_uri=http%3a%2f%2f47.106.137.161%2fwechatpj%2fauth&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect\"}]}";
-	  String jstr="{\"touser\":\"oun5n1Gq94XJBrljmUfZdxIleT-M\",\"template_id\":\"SDRICMxGpiqt74xOpn3p369eGaPYLoLtzO1RjMDF1-o\",\"data\":{\"test1\":{\"value\":\"恭喜你购买成功！\",\"color\":\"#173177\"},\"test2\":{\"value\":\"巧克力\",\"color\":\"#173177\"}}}";
+	  String jstr="{\"button\":[{\"type\":\"view\",\"name\":\"网页测试\",\"url\":\"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8e5f5d2d8e884804&redirect_uri=http://47.106.137.161/wechatpj/index.html&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect\"},{\"type\":\"view\",\"name\":\"消息测试\",\"url\":\"http://47.106.137.161/wechatpj/wxkf.html\"}]}";
+	  
 	  StringEntity stringEntity;
       try {
         stringEntity = new StringEntity(new String(jstr.getBytes("UTF-8"),"ISO-8859-1"));
         stringEntity.setContentEncoding("UTF-8");
         stringEntity.setContentType("application/json");
-//        String url="https://api.weixin.qq.com/cgi-bin/menu/create?access_token=";
-        String url="https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=";
+        String url="https://api.weixin.qq.com/cgi-bin/menu/create?access_token=";
+//        String url="https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=";
         String str = HttpSendUtil.sendPost(url+token, stringEntity);
         System.out.println(str);
         
-//        List<NameValuePair> params = new ArrayList<NameValuePair>();
-//        params.add(new BasicNameValuePair("access_token", token));
-//        String getm = HttpSendUtil.sendGet("https://api.weixin.qq.com/cgi-bin/menu/get", params);
-//        System.out.println(new String(getm.getBytes("ISO-8859-1"),"UTF-8"));
       } catch (Exception e) {
         // TODO Auto-generated catch block
         e.printStackTrace();

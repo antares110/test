@@ -1,9 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>index</title>
+<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
 </head>
 <body>
-	<h1>hello</h1>
+<div id="app">
+  
+  头像：<img :src="imgurl" />
+  <br/>
+  昵称：<label>{{nickname}}</label>
+  
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue.js!',
+    imgurl:'',
+    nickname:''
+  },
+  mounted: function () {
+	  this.$nextTick(function () {
+	    this.getinfo();
+	  })
+  },
+  methods:{
+	  getinfo:function(){
+		  let mycode=this.getUrlParam('code');
+  		  axios.get('http://47.106.137.161/wechatpj/wechatinfo',{
+              params:{code:mycode}
+          })
+          .then(resp => {
+        	      let retJson=resp.data;
+              console.log('####################'+retJson);
+              this.imgurl=retJson.headimgurl;
+              this.nickname=retJson.nickname;
+          }).catch(err => {             //
+              console.log('请求失败：'+err.status+','+err.statusText);
+          }); 
+		    
+	  },
+  
+     getUrlParam:function(name) {  
+	    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); // 构造一个含有目标参数的正则表达式对象  
+	    var r = window.location.search.substr(1).match(reg);  // 匹配目标参数  
+	    if (r != null) return unescape(r[2]); return null; // 返回参数值  
+	 }
+  }
+})
+</script>
 </body>
 </html>
