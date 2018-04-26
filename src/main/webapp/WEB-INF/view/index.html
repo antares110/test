@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>index</title>
+<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <p>{{ message }}</p>
+</div>
+
+<script>
+new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue.js!'
+  },
+  methods:{
+	  getinfo:function(){
+		  axios.get('server.php',{
+              params:{
+                  name:'alice',
+                  age:19
+              }
+          })
+          .then(resp => {
+              console.log(resp.data);
+          }).catch(err => {             //
+              console.log('请求失败：'+err.status+','+err.statusText);
+          });
+	  }
+  }
+})
+</script>
+</body>
+</html>

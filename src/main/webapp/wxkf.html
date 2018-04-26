@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+<title>Insert title here</title>
+</head>
+<body>
+	<div id="app">
+	    <table border="1">
+	    <tr>
+		<th>openid</th>
+		<th>message</th>
+		<th>operation</th>
+		</tr>
+		<tr v-for='(item,index) in msglist'>
+		  <td>{{item.fromUserName}}</td>
+		  <td>{{item.content}}</td>
+		  <td>
+		  <input type="text" :id="geninputid(index)"  value=""/>
+		  <button type="button" @click="sendmsg(item,index)">回复</button>
+		  </td>
+		</tr>
+		
+		</table>
+	</div>
+	
+<script>
+new Vue({
+	  el: '#app',
+	  data: {
+	    message: 'Hello Vue.js!',
+	    msglist:[]
+	  },
+	  mounted: function () {
+	      this.$nextTick(function () {
+	    	    this.refreshfunc();
+	      })
+	  },
+	  methods:{
+		  refreshfunc:function(){
+			  setInterval(this.getinfolist,5000);
+		  },
+	      getinfolist:function(){
+	          axios.get('http://47.106.137.161/wechatpj/wxkfinfo',{
+	              params:{}
+	          })
+	          .then(resp => {
+	              let retJson=resp.data;
+	              console.log('####################'+retJson);
+	              for (let item of retJson){
+	            	    let itemobj=JSON.parse(item);
+	            	    this.msglist.push(itemobj);
+	            	    //console.log(itemobj.content);
+	            	    
+	              }
+	          }).catch(err => {             //
+	              console.log('请求失败：'+err.status+','+err.statusText);
+	          }); 
+	            
+	      },
+	      
+	      sendmsg:function(myitem,index){
+	    	    let touser=myitem.fromUserName;
+	    	    let input=document.getElementById("myinput_"+index).value;
+	    	    
+	    	    axios.post('http://47.106.137.161/wechatpj/wxkfinfo', {
+	    	        retMsg: input,
+	    	        toUser: touser
+	    	      })
+	    	      .then(function (response) {
+	    	        console.log(response);
+	    	      })
+	    	      .catch(function (error) {
+	    	        console.log(error);
+	    	      });
+	    	    document.getElementById("myinput_"+index).value="";
+	    	    this.msglist.splice(index,1);
+	      },
+
+	     geninputid:function(index){
+	    	    return "myinput_"+index;
+	     }
+	  }
+	})
+</script>
+</body>
+</html>
