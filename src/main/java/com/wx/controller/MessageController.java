@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONPObject;
 import com.wx.util.CheckoutUtil;
 import com.wx.util.HttpSendUtil;
+import com.wx.util.MapUtil;
 import com.wx.util.MyList;
 import com.wx.util.TokenUtilForWX;
 import com.wx.util.XmlTransformUtil;
@@ -109,6 +111,7 @@ public class MessageController {
               }
               
               if (flag) {
+//                MapUtil.getInstance().putVal(msgVO);
                 String jstr=JSON.toJSONString(msgVO);
                 mylist.push(jstr);
               }
@@ -248,6 +251,7 @@ public class MessageController {
     response.getWriter().write(str);
     response.getWriter().flush();
   }
+  
   
   
   

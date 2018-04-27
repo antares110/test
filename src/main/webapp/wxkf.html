@@ -2,36 +2,44 @@
 <html>
 <head>
 <meta charset="UTF-8" name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://cdn.bootcss.com/element-ui/2.3.6/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://cdn.bootcss.com/element-ui/2.3.6/index.js"></script>
 <title>Insert title here</title>
 </head>
 <body>
 	<div id="app">
-	    <table border="1">
-	    <tr>
-		<th>openid</th>
-		<th>message</th>
-		<th>operation</th>
-		</tr>
-		<tr v-for='(item,index) in msglist'>
-		  <td>{{item.fromUserName}}</td>
-		  <td>{{item.content}}</td>
-		  <td>
-		  <input type="text" :id="geninputid(index)"  value=""/>
-		  <button type="button" @click="sendmsg(item,index)">回复</button>
-		  </td>
-		</tr>
-		
-		</table>
+	
+        <table border="1">
+        <tr>
+        <th>openid</th>
+        <th>message</th>
+        <th>operation</th>
+        </tr>
+        <tr v-for='(item,index) in msglist'>
+          <td>{{item.fromUserName}}</td>
+          <td>{{item.content}}</td>
+          <td>
+          <input type="text" :id="geninputid(index)"  value=""/>
+          <button type="button" @click="sendmsg(item,index)">回复</button>
+          </td>
+        </tr>
+        
+        </table>
+
 	</div>
 	
 <script>
 new Vue({
 	  el: '#app',
-	  data: {
-	    message: 'Hello Vue.js!',
-	    msglist:[]
+	  data:function(){
+		  return {
+			  message: 'Hello Vue.js!',
+		      msglist:[]
+		  };
 	  },
 	  mounted: function () {
 	      this.$nextTick(function () {

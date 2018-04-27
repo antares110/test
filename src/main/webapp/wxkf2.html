@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://cdn.bootcss.com/element-ui/2.3.6/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<script src="https://cdn.bootcss.com/element-ui/2.3.6/index.js"></script>
+<title>Insert title here</title>
+</head>
+<body>
+    <div id="app">
+        <el-table
+          :data="msglist"
+          border
+          style="width: 100%">
+          <el-table-column
+            prop="fromUserName"
+            label="openid"
+            width="180">
+          </el-table-column>
+          <el-table-column
+            prop="content"
+            label="content"
+            width="680">
+          </el-table-column>
+          <el-table-column
+              fixed="right"
+              label="操作">
+              <template slot-scope="scope">
+                <el-button @click="handleClick(scope.$index,scope.row)" type="primary">回复</el-button>
+                <el-button @click="handleDel(scope.$index)" type="danger">删除</el-button>
+              </template>
+          </el-table-column>
+        </el-table>
+        
+        
+        <el-dialog title="回复" :visible.sync="editFormVisible" :close-on-click-modal="false">
+            <el-form :model="editForm" label-width="80px" ref="editForm">
+
+                <el-form-item label="Touser:">
+                    {{editForm.touser}}
+                </el-form-item>
+                <el-form-item label="Conetent:">
+                    {{editForm.content}}
+                </el-form-item>
+                <el-form-item label="recontent:">
+                    <el-input type="textarea" v-model="editForm.recontent"></el-input>
+                </el-form-item>
+                <el-form-item label="" style="color:red">
+                    {{editForm.senderr}}
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click.native="editFormVisible = false">取消</el-button>
+                <el-button type="primary" @click.native="sendmsg" :loading="editLoading">回复</el-button>
+            </div>
+        </el-dialog>
+    </div>
+    
+<script>
+new Vue({
+      el: '#app',
+      data:function(){
+          return {
+              message: 'Hello Vue.js!',
+              msglist:[],
+              editFormVisible:false,
+              editForm:{touser:"",content:"",recontent:"",senderr:""},
+              editLoading: false,
+          };
+      },
+      mounted: function () {
+          this.$nextTick(function () {
+                this.refreshfunc();
+          })
+      },
+      methods:{
+          handleClick(index,row) {
+              console.log(index);
+              this.editFormVisible=true;
+              this.editForm.touser=row.fromUserName;
+              this.editForm.content=row.content;
+              this.editForm.recontent="";
+              this.editForm.senderr="";
+              this.editForm.index=index;
+          },
+          refreshfunc:function(){
+              setInterval(this.getinfolist,5000);
+          },
+          getinfolist:function(){
+              axios.get('http://47.106.137.161/wechatpj/wxkfinfo',{
+                  params:{}
+              })
+              .then(resp => {
+                  let retJson=resp.data;
+                  console.log('####################'+retJson);
+                  for (let item of retJson){
+                        let itemobj=JSON.parse(item);
+                        this.msglist.push(itemobj);
+                        //console.log(itemobj.content);
+                        
+                  }
+              }).catch(err => {             //
+                  console.log('请求失败：'+err.status+','+err.statusText);
+              }); 
+                
+          },
+          
+          sendmsg:function(){
+                let touser=this.editForm.touser;
+                let input=this.editForm.recontent;
+                let index=this.editForm.index;
+                this.editLoading=true;
+                axios.post('http://47.106.137.161/wechatpj/wxkfinfo', {
+                    retMsg: input,
+                    toUser: touser
+                  })
+                  .then((response)=>{
+                    console.log(response);
+                    if (response.data.errmsg!="ok"){
+                    	   this.editForm.senderr=response.data.errmsg;
+                    }else{
+                    	   this.editFormVisible = false;
+                       this.msglist.splice(index,1);
+                    }
+                    this.editLoading=false;
+                  })
+                  .catch((error)=>{
+                    console.log(error);
+                    this.editForm.senderr=error.message;
+                    this.editLoading=false;
+                  });
+                
+                
+          },
+
+          handleDel:function(index){
+        	    this.msglist.splice(index,1);
+          }
+      }
+    })
+</script>
+</body>
+</html>
