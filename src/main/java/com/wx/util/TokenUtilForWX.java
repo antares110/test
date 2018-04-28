@@ -157,7 +157,7 @@ public class TokenUtilForWX {
 	public static void main (String args[]) {
 	  String token=TokenUtilForWX.getInstance().getToken();
 	  System.out.println(token);
-	  String jstr="{\"button\":[{\"type\":\"view\",\"name\":\"网页测试\",\"url\":\"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8e5f5d2d8e884804&redirect_uri=http://47.106.137.161/wechatpj/index.html&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect\"},{\"type\":\"view\",\"name\":\"消息测试\",\"url\":\"http://47.106.137.161/wechatpj/wxkf.html\"}]}";
+	  String jstr="{\"button\":[{\"type\":\"view\",\"name\":\"网页测试\",\"url\":\"https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx8e5f5d2d8e884804&redirect_uri=http://47.106.137.161/wechatpj/index.html&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect\"},{\"type\":\"view\",\"name\":\"消息测试\",\"url\":\"http://47.106.137.161/wechatpj/wxkf2.html\"}]}";
 	  
 	  StringEntity stringEntity;
       try {
